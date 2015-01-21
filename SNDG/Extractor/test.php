@@ -8,5 +8,6 @@ if($var_test == "huhu"){
 }
 else{
 	echo("bouhhh");
+	echo("baaaah");
 }
 ?>
