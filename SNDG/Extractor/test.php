@@ -1,5 +1,6 @@
 <?php
-echo("test\n");
+require 'vendor/autoload.php';
+echo("test2\n");
 $var_test="huhu";
 if($var_test == "huhu"){
 	echo("ouaiiiis");
