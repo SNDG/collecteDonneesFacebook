@@ -37,6 +37,8 @@ if (isset($session)) {
     $fbfullname = $graphObject -> getProperty('name');
     // To Get Facebook full name
     $femail = $graphObject -> getProperty('email');
+    // To Get Facebook full name
+    $fbirthday = $graphObject -> getProperty('birthday');
 
     try {
         // Logged in
@@ -54,10 +56,11 @@ if (isset($session)) {
     $_SESSION['FULLNAME'] = $fbfullname;
     $_SESSION['EMAIL'] = $femail;
     $_SESSION['FRIENDS'] = $friends;
+    $_SESSION['BIRTHDAY'] = $fbirthday;
     /* ---- header location after session ----*/
     header("Location: index.php");
 } else {
-    $params = array('scope' => 'user_friends');
+    $params = array('scope' => 'user_friends, email, user_birthday');
     //permissions
     $loginUrl = $helper -> getLoginUrl($params);
     header("Location: " . $loginUrl);
