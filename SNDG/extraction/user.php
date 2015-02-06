@@ -78,10 +78,11 @@ class User {
     //string
     protected $user_work;
     //object[]
+    protected $friendList;
 
-    function __construct($user = '/me') {
+    function __construct($user = 'me') {
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', $user);
+        $request = new FacebookRequest($session, 'GET', '/'.$user);
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
@@ -123,10 +124,21 @@ class User {
         $this -> user_verified = $graphObject -> getProperty('verified');
         $this -> user_website = $graphObject -> getProperty('website');
         $this -> user_work = $graphObject -> getProperty('work');
+        
+        // graph api request for user data
+        $request = new FacebookRequest($session, 'GET', '/'.$this->user_id.'/friends');
+        $response = $request -> execute();
+        // get response
+        $graphObject = $response -> getGraphObject();
+        $this->friendList = $graphObject -> asArray(); 
     }
 
     public function getEmail() {
         return $this -> user_email;
+    }
+    
+    public function getFriends() {
+       
     }
 
 }

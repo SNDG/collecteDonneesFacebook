@@ -28,7 +28,7 @@ try {
 // see if we have a session
 if (isset($session)) {
     // graph api request for user data
-    $request = new FacebookRequest($session, 'GET', '/me');
+    $request = new FacebookRequest($session, 'GET', '/me?fields=name,birthday,hometown,political,email');
     $response = $request -> execute();
     // get response
     $graphObject = $response -> getGraphObject();
@@ -39,6 +39,17 @@ if (isset($session)) {
     $femail = $graphObject -> getProperty('email');
     // To Get Facebook full name
     $fbirthday = $graphObject -> getProperty('birthday');
+    // To Get Facebook full name
+    $flocation = $graphObject -> getProperty('hometown');
+    //$flocation = $flocation['name'];
+    $fpolitical = $graphObject -> getProperty('political');
+    
+    /*$flocation = new FacebookRequest($session, 'GET', '/me?fields=hometown{name}');
+    $flocation= $flocation -> execute() -> getGraphObject(GraphUser::className());
+    $flocation = $flocation -> asArray();*/
+    if (isset($flocation)) {
+        $flocation = $flocation -> getProperty('name');        
+    }
 
     try {
         // Logged in
@@ -57,10 +68,12 @@ if (isset($session)) {
     $_SESSION['EMAIL'] = $femail;
     $_SESSION['FRIENDS'] = $friends;
     $_SESSION['BIRTHDAY'] = $fbirthday;
+    $_SESSION['LOCATION'] = $flocation;
+    $_SESSION['POLITICAL'] = $fpolitical;
     /* ---- header location after session ----*/
     header("Location: index.php");
 } else {
-    $params = array('scope' => 'user_friends, email, user_birthday');
+    $params = array('scope' => 'user_friends, email, user_birthday, user_hometown, user_religion_politics');
     //permissions
     $loginUrl = $helper -> getLoginUrl($params);
     header("Location: " . $loginUrl);

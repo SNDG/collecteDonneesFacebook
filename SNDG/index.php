@@ -32,12 +32,19 @@ foreach($_SESSION['FRIENDS']['data'] as $friend) {
     $nb_friends_app++;
 } 
 $nb_friends=$_SESSION['FRIENDS']['summary']->{"total_count"};
-echo "Total number of friends : ".$nb_friends."\n";
+echo "Total number of friends : ".$nb_friends, '<br>';
 echo "Friends using the app / Total number of friends : ".($nb_friends_app/$nb_friends)."\n";
 //var_dump($_SESSION['FRIENDS']);
 ?></li>
 <li class="nav-header">Birthday</li>
 <li><?php echo $_SESSION['BIRTHDAY']; ?></li>
+<li class="nav-header">Location</li>
+<li><?php 
+echo $_SESSION['LOCATION']; 
+//var_dump($_SESSION['LOCATION']);
+?></li>
+<li class="nav-header">Politics</li>
+<li><?php echo $_SESSION['POLITICAL']; ?></li>
 
 <div><a href="logout.php">Logout</a></div>
 </ul></div></div>
