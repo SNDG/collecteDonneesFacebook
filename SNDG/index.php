@@ -34,6 +34,7 @@ foreach($_SESSION['FRIENDS']['data'] as $friend) {
 $nb_friends=$_SESSION['FRIENDS']['summary']->{"total_count"};
 echo "Total number of friends : ".$nb_friends, '<br>';
 echo "Friends using the app / Total number of friends : ".($nb_friends_app/$nb_friends)."\n";
+echo "first friend : ".$_SESSION['FRIENDS']['data'][0]->{"name"}, '<br>';
 //var_dump($_SESSION['FRIENDS']);
 ?></li>
 <li class="nav-header">Birthday</li>
@@ -45,6 +46,11 @@ echo $_SESSION['LOCATION'];
 ?></li>
 <li class="nav-header">Politics</li>
 <li><?php echo $_SESSION['POLITICAL']; ?></li>
+<li class="nav-header">Mutual friends</li>
+<li><?php 
+echo json_encode($_SESSION['MUTUAL']); 
+//var_dump($_SESSION['MUTUAL']);
+?></li>
 
 <div><a href="logout.php">Logout</a></div>
 </ul></div></div>

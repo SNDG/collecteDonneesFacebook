@@ -77,12 +77,14 @@ class User {
     protected $user_website;
     //string
     protected $user_work;
+    
+    /* Edges */
     //object[]
     protected $friendList;
 
     function __construct($user = 'me') {
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/'.$user);
+        $request = new FacebookRequest($session, 'GET', '/' . $user);
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
@@ -124,21 +126,41 @@ class User {
         $this -> user_verified = $graphObject -> getProperty('verified');
         $this -> user_website = $graphObject -> getProperty('website');
         $this -> user_work = $graphObject -> getProperty('work');
-        
+
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/'.$this->user_id.'/friends');
+        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
-        $this->friendList = $graphObject -> asArray(); 
+        $this -> friendList = $graphObject -> asArray();
     }
 
     public function getEmail() {
         return $this -> user_email;
     }
-    
+
     public function getFriends() {
-       
+        return $this -> friendList;
+    }
+    
+    public function makeAdjacencyMatrix(){
+        /* Creation of the adjacency matrix */
+        $adj_matrix = array();
+         
+        /* Filling the adjacency matrix */
+        for($i=0;$i<n;$i++){
+          for($j=0;$j<n;$j++){
+            $friendship = new FacebookRequest($session, 'GET', '/'.$friendlist['data'][i]->{"id"}.'/friends/'.$friendlist['data'][j]->{"id"});
+            $friendship = $friendship -> execute() -> getGraphObject(GraphUser::className());
+            $friendship = $friendship -> asArray();
+            if(array_key_exists(0,$friendship['data'])){
+              $adj_matrix[i][j] = 1;
+            }
+            else{
+              $adj_matrix[i][j] = 0;
+            }
+          }
+        }        
     }
 
 }

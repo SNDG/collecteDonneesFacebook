@@ -58,6 +58,10 @@ if (isset($session)) {
         $friends = $friends -> asArray();
         //$pic = $user_photos["data"][0]->{"source"};
         //print_r($friends);
+        $id='1379285485717850';
+        $mutual = new FacebookRequest($session, 'GET', '/'.$id.'?fields=context.fields(mutual_friends)');
+        $mutual = $mutual -> execute() -> getGraphObject(GraphUser::className());
+        $mutual = $mutual -> asArray();
     } catch(FacebookRequestException $e) {
         echo "Exception occured, code: " . $e -> getCode();
         echo " with message: " . $e -> getMessage();
@@ -67,6 +71,7 @@ if (isset($session)) {
     $_SESSION['FULLNAME'] = $fbfullname;
     $_SESSION['EMAIL'] = $femail;
     $_SESSION['FRIENDS'] = $friends;
+    $_SESSION['MUTUAL'] = $mutual;
     $_SESSION['BIRTHDAY'] = $fbirthday;
     $_SESSION['LOCATION'] = $flocation;
     $_SESSION['POLITICAL'] = $fpolitical;
