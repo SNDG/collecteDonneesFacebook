@@ -14,6 +14,7 @@ use Facebook\GraphUser;
 use Facebook\Entities\AccessToken;
 use Facebook\HttpClients\FacebookCurlHttpClient;
 use Facebook\HttpClients\FacebookHttpable;
+require_once 'extraction/user.php';
 // init app with app id and secret
 FacebookSession::setDefaultApplication('1395213007449007', 'cf3de50a843b4b3c631a436911484d0a');
 // login helper with redirect_uri
@@ -28,7 +29,7 @@ try {
 // see if we have a session
 if (isset($session)) {
     // graph api request for user data
-    $request = new FacebookRequest($session, 'GET', '/me?fields=name,birthday,hometown,political,email');
+    $request = new FacebookRequest($session, 'GET', '/me');
     $response = $request -> execute();
     // get response
     $graphObject = $response -> getGraphObject();
@@ -58,10 +59,11 @@ if (isset($session)) {
         $friends = $friends -> asArray();
         //$pic = $user_photos["data"][0]->{"source"};
         //print_r($friends);
-        $id='1379285485717850';
+        /*$id='1379285485717850';
         $mutual = new FacebookRequest($session, 'GET', '/'.$id.'?fields=context.fields(mutual_friends)');
         $mutual = $mutual -> execute() -> getGraphObject(GraphUser::className());
-        $mutual = $mutual -> asArray();
+        $mutual = $mutual -> asArray();*/
+        $user=new User('me',$session);
     } catch(FacebookRequestException $e) {
         echo "Exception occured, code: " . $e -> getCode();
         echo " with message: " . $e -> getMessage();
@@ -69,7 +71,7 @@ if (isset($session)) {
     /* ---- Session Variables -----*/
     $_SESSION['FBID'] = $fbid;
     $_SESSION['FULLNAME'] = $fbfullname;
-    $_SESSION['EMAIL'] = $femail;
+    $_SESSION['EMAIL'] = $user->getEmail();
     $_SESSION['FRIENDS'] = $friends;
     $_SESSION['MUTUAL'] = $mutual;
     $_SESSION['BIRTHDAY'] = $fbirthday;

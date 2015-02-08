@@ -1,4 +1,17 @@
 <?php
+require_once 'autoload.php';
+use Facebook\FacebookSession;
+use Facebook\FacebookRedirectLoginHelper;
+use Facebook\FacebookRequest;
+use Facebook\FacebookResponse;
+use Facebook\FacebookSDKException;
+use Facebook\FacebookRequestException;
+use Facebook\FacebookAuthorizationException;
+use Facebook\GraphObject;
+use Facebook\GraphUser;
+use Facebook\Entities\AccessToken;
+use Facebook\HttpClients\FacebookCurlHttpClient;
+use Facebook\HttpClients\FacebookHttpable;
 /**
  * Class containing the user node
  */
@@ -82,7 +95,7 @@ class User {
     //object[]
     protected $friendList;
 
-    function __construct($user = 'me') {
+    function __construct($user = 'me',$session) {
         // graph api request for user data
         $request = new FacebookRequest($session, 'GET', '/' . $user);
         $response = $request -> execute();
