@@ -1,0 +1,17 @@
+{
+  "nodes":[
+    {"name":"Myriel"},
+    {"name":"Napoleon"},
+    {"name":"Mlle.Baptistine"},
+    {"name":"Mme.Magloire"},
+    {"name":"CountessdeLo"},
+    {"name":"Geborand"}
+  ],
+  "links":[
+    {"source":1,"target":0},
+    {"source":2,"target":0},
+    {"source":3,"target":0},
+    {"source":4,"target":0},
+    {"source":5,"target":0}
+  ]
+}

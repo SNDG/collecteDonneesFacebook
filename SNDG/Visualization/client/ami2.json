@@ -1,0 +1,17 @@
+{
+   "nodes":[
+	{"name":"Moi"},
+    {"name":"Will Amikdcjcfif Sidhuson"},
+    {"name":"Lisa Amijgdhfcggj Smithwitz"},
+    {"name":"Mike Amijibcdijae Goldmansen"}
+   ],
+   "links":[
+    {"source":1,"target":0},
+    {"source":2,"target":0},
+	{"source":3,"target":0},
+    {"source":1,"target":3},
+    {"source":2,"target":3},
+	{"source":3,"target":1},
+	{"source":3,"target":2}
+   ]
+}

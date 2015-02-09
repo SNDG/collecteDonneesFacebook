@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Social Network Data Gathering</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,600|Source+Code+Pro" rel="stylesheet" />
+		<!--[if lte IE 8]><script src="html5shiv.js" type="text/javascript"></script><![endif]-->
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script src="js/jquery.dropotron.min.js"></script>		
+		<script src="js/skel.min.js">
+		{
+			prefix: 'css/style',
+			preloadStyleSheets: true,
+			resetCSS: true,
+			boxModel: 'border',
+			grid: { gutters: 30 },
+			breakpoints: {
+				wide: { range: '1200-', containers: 1140, grid: { gutters: 50 } },
+				narrow: { range: '481-1199', containers: 960 },
+				mobile: { range: '-480', containers: 'fluid', lockViewport: true, grid: { collapse: true } }
+			}
+		}
+		</script>
+		<script>
+			$(function() {
+
+				// Note: make sure you call dropotron on the top level <ul>
+				$('#main-nav > ul').dropotron({ 
+					offsetY: -10 // Nudge up submenus by 10px to account for padding
+				});
+
+			});
+		</script>
+		<script>
+			// DOM ready
+			$(function() {
+    
+			// Create the dropdown base
+			$("<select />").appendTo("nav");
+   
+			// Create default option "Go to..."
+			$("<option />", {
+				"selected": "selected",
+				"value"   : "",
+				"text"    : "Menu"
+			}).appendTo("nav select");
+   
+			// Populate dropdown with menu items
+			$("nav a").each(function() {
+			var el = $(this);
+			$("<option />", {
+				"value"   : el.attr("href"),
+				"text"    : el.text()
+			}).appendTo("nav select");
+			});
+   
+			// To make dropdown actually work
+			// To make more unobtrusive: http://css-tricks.com/4064-unobtrusive-page-changer/
+			$("nav select").change(function() {
+				window.location = $(this).find("option:selected").val();
+			});
+  
+			});
+		</script>	
+	</head>
+	<body>
+		<div id="header_container">		
+		    <div class="container">
+			<!-- Header -->
+				<div id="header" class="row">
+					<div class="4u">
+						<div class="box">
+							<h1><a href="index.html">Social Network Data Gathering<span class="header_colour"></span></a></h1>
+							<h2>Télécom Bretagne</h2>
+					    </div>
+					</div>
+					
+					<nav id="main-nav" class="8u">
+						<ul>
+							<li><a class="active" href="index.html">Home</a></li>
+							<li><a href="profil.html">Mon profil</a></li>
+							<li><a href="graphe.html">Mon graphe d'amis</a></li>							
+							<li><a href="contact.php">Contact</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>	
+        </div>		
+
+		<!-- Banner -->		
+		<div id="banner_wrapper">	
+			<div class="container">					
+				<div id="banner">
+					<a href="#"><img src="images/banner.jpg" alt="banner image" /></a>
+				</div>	
+            </div>	
+        </div>			
+		
+		<div id="site_content">
+			<div class="container">			
+				
+			<!-- Features -->
+				<div class="row">
+					<section class="6u">
+						<h1>Welcome to Social Network Data Gathering</h1>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu fringilla risus, vitae posuere lorem. Nam semper non erat et vulputate. Vivamus semper commodo eros, ut ultricies nisl tristique vel. Quisque sem mauris, vestibulum vel pretium id, molestie at augue. Pellentesque mattis vitae tellus in sodales. Proin lacinia lorem in consequat egestas. Nunc eget diam cursus, ornare dolor eget, dignissim leo.</p>
+					</section>
+					<section class="6u">
+						<a href="#" class="image" ><img src="images/content_image.jpg" alt="image"/></a>
+					</section>					
+				</div>
+				<div class="row">	
+					<section class="4u">
+						<div class="box">						
+							<h3>Template</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu fringilla risus, vitae posuere lorem. Nam semper non erat et vulputate. Vivamus semper commodo eros, ut ultricies nisl tristique vel. Quisque sem mauris, vestibulum vel pretium id, molestie at augue. Pellentesque mattis vitae tellus in sodales. Proin lacinia lorem in consequat egestas. Nunc eget diam cursus, ornare dolor eget, dignissim leo.</p>
+						</div>
+					</section>		
+					<section class="4u">
+						<div class="box">
+							<h3>Template</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu fringilla risus, vitae posuere lorem. Nam semper non erat et vulputate. Vivamus semper commodo eros, ut ultricies nisl tristique vel. Quisque sem mauris, vestibulum vel pretium id, molestie at augue. Pellentesque mattis vitae tellus in sodales. Proin lacinia lorem in consequat egestas. Nunc eget diam cursus, ornare dolor eget, dignissim leo.</p>
+						</div>
+					</section>						
+					<section class="4u">
+						<div class="box">
+							<section class="12u">
+								<h3>Latest News</h3>
+								<h4>New Website Launched</h4>
+								<h5>Février  1st, 2014</h5>
+								<p>2015 sees the redesign of our website. <a href="#">Read more</a></p>
+							</section>
+							<section class="12u">
+								<h3>Useful Links</h3>
+								<ul>
+									<li><a href="#">First Link</a></li>
+									<li><a href="#">Another Link</a></li>
+									<li><a href="#">And Another</a></li>
+									<li><a href="#">Last One</a></li>
+								</ul>
+							</section>
+						</div>
+					</section>
+					
+				</div>
+			</div>
+        </div>	
+		
+			<div class="container">			
+			<!-- Footer -->
+				<footer>
+					<p><img src="images/twitter.png" alt="twitter" />&nbsp;<img src="images/facebook.png" alt="facebook" />&nbsp;<img src="images/rss.png" alt="rss" /></p>
+					<p><a href="index.html">Home</a> | <a href="profil.html">Mon profil</a> | <a href="graphe.html">Mon graphe d'amis</a> | <a href="contact.php">Contact Us</a></p>
+				</footer>		
+			</div>		
+			
+	</body>
+</html>

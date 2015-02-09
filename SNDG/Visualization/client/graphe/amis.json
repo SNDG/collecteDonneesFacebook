@@ -1,0 +1,33 @@
+{
+"name": "Nicolas Buzy-Debat",
+"children": [
+	{
+	"name": "Gaëtan Briant",
+	"children": [
+		{"name": "Julien Gambier-morel"},
+		{"name": "Kaji Sothy"},
+		]
+	},
+	{
+	"name": "Stéphane Tanguy",
+	"children": [
+		{"name": "Julien Gambier-morel"},
+		{"name": "Kaji Sothy"},
+		]
+	},
+	{
+	"name": "Julien Gambier-morel",
+	"children": [
+		{"name": "Gaëtan Briant"},
+		{"name": "Kaji Sothy"},
+		]
+	},
+	{
+	"name": "Kaji Sothy",
+	"children": [
+		{"name": "Julien Gambier-morel"},
+		{"name": "Gaëtan Briant"},
+		]
+	}
+	]
+}
