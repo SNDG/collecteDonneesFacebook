@@ -16,6 +16,7 @@ use Facebook\HttpClients\FacebookHttpable;
  * Class containing the user node
  */
 class User {
+    protected $session;
     /* fields */
     protected $user_id;
     //string
@@ -94,10 +95,15 @@ class User {
     /* Edges */
     //object[]
     protected $friendList;
+    //int
+    protected $friendTotalCount;
+    /* Adjacency matrix */
+    protected $adj_matrix;
 
     function __construct($user = 'me',$session) {
+        $this->session=$session;
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/' . $user);
+        $request = new FacebookRequest($this->session, 'GET', '/' . $user);
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
@@ -146,35 +152,50 @@ class User {
         // get response
         $graphObject = $response -> getGraphObject();
         $this -> friendList = $graphObject -> asArray();
+        $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
     }
 
-    public function getEmail() {
-        return $this -> user_email;
-    }
-
-    public function getFriends() {
-        return $this -> friendList;
-    }
-    
-    public function makeAdjacencyMatrix(){
+    public function makeAdjMatrix(){
         /* Creation of the adjacency matrix */
-        $adj_matrix = array();
+        $this->adj_matrix = array();
          
         /* Filling the adjacency matrix */
-        for($i=0;$i<n;$i++){
-          for($j=0;$j<n;$j++){
-            $friendship = new FacebookRequest($session, 'GET', '/'.$friendlist['data'][i]->{"id"}.'/friends/'.$friendlist['data'][j]->{"id"});
+        $n=$this -> friendTotalCount;
+        for($i=0;$i<$n;$i++){
+          for($j=0;$j<$n;$j++){
+            $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
             $friendship = $friendship -> execute() -> getGraphObject(GraphUser::className());
             $friendship = $friendship -> asArray();
             if(array_key_exists(0,$friendship['data'])){
-              $adj_matrix[i][j] = 1;
+              $this->adj_matrix[$i][$j] = 1;
+              //echo "test 1";
             }
             else{
-              $adj_matrix[i][j] = 0;
+              $this->adj_matrix[$i][$j] = 0;
+              //echo "test0";
             }
           }
         }        
     }
+    
+    public function getEmail() {
+        return $this -> user_email;
+    }
+
+    public function getFriends($json=true) {
+        if($json)
+            return json_encode($this -> friendList);
+        else
+            return $this -> friendList;
+    }
+    
+    public function getAdjMatrix($json=true) {
+        if($json)
+            return json_encode($this -> adj_matrix);
+        else
+            return $this -> adj_matrix;
+    }
+
 
 }
 ?>

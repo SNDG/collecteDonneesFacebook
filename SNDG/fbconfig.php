@@ -64,6 +64,7 @@ if (isset($session)) {
         $mutual = $mutual -> execute() -> getGraphObject(GraphUser::className());
         $mutual = $mutual -> asArray();*/
         $user=new User('me',$session);
+        $user->makeAdjMatrix();
     } catch(FacebookRequestException $e) {
         echo "Exception occured, code: " . $e -> getCode();
         echo " with message: " . $e -> getMessage();
@@ -72,8 +73,8 @@ if (isset($session)) {
     $_SESSION['FBID'] = $fbid;
     $_SESSION['FULLNAME'] = $fbfullname;
     $_SESSION['EMAIL'] = $user->getEmail();
-    $_SESSION['FRIENDS'] = $friends;
-    $_SESSION['MUTUAL'] = $mutual;
+    $_SESSION['FRIENDS'] = $user->getFriends();
+    $_SESSION['ADJ'] = $user->getAdjMatrix();
     $_SESSION['BIRTHDAY'] = $fbirthday;
     $_SESSION['LOCATION'] = $flocation;
     $_SESSION['POLITICAL'] = $fpolitical;

@@ -26,16 +26,18 @@ session_start();
 <li><?php echo $_SESSION['EMAIL']; ?></li>
 <li class="nav-header">Friends</li>
 <li><?php 
-$nb_friends_app=0;
-foreach($_SESSION['FRIENDS']['data'] as $friend) {
-    echo $friend->{"name"}, '<br>';
-    $nb_friends_app++;
-} 
-$nb_friends=$_SESSION['FRIENDS']['summary']->{"total_count"};
-echo "Total number of friends : ".$nb_friends, '<br>';
-echo "Friends using the app / Total number of friends : ".($nb_friends_app/$nb_friends)."\n";
-echo "first friend : ".$_SESSION['FRIENDS']['data'][0]->{"name"}, '<br>';
+//$nb_friends_app=0;
+//foreach($_SESSION['FRIENDS']['data'] as $friend) {
+//    echo $friend->{"name"}, '<br>';
+//    $nb_friends_app++;
+//} 
+//$nb_friends=$_SESSION['FRIENDS']['summary']->{"total_count"};
+//echo "Total number of friends : ".$nb_friends, '<br>';
+//echo "Friends using the app / Total number of friends : ".($nb_friends_app/$nb_friends)."\n";
+//echo "first friend : ".$_SESSION['FRIENDS']['data'][0]->{"name"}, '<br>';
 //var_dump($_SESSION['FRIENDS']);
+echo $_SESSION['FRIENDS'], '<br>';
+
 ?></li>
 <li class="nav-header">Birthday</li>
 <li><?php echo $_SESSION['BIRTHDAY']; ?></li>
@@ -46,9 +48,9 @@ echo $_SESSION['LOCATION'];
 ?></li>
 <li class="nav-header">Politics</li>
 <li><?php echo $_SESSION['POLITICAL']; ?></li>
-<li class="nav-header">Mutual friends</li>
+<li class="nav-header">Adjacency matrix</li>
 <li><?php 
-echo json_encode($_SESSION['MUTUAL']); 
+echo $_SESSION['ADJ']; 
 //var_dump($_SESSION['MUTUAL']);
 ?></li>
 
