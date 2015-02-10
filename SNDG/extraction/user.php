@@ -32,6 +32,8 @@ class User {
     //object
     protected $user_cover;
     //CoverPhoto
+    protected $user_cover_source;
+    //string
     protected $user_currency;
     //object
     protected $user_devices;
@@ -48,8 +50,9 @@ class User {
     //string
     protected $user_gender="";
     //string
-    protected $user_hometown="";
+    protected $user_hometown;
     //Page
+    protected $user_hometown_string="";
     protected $user_inspirational_people;
     //Page[]
     protected $user_installed;
@@ -65,6 +68,7 @@ class User {
     protected $user_locale="";
     //string
     protected $user_location;
+    protected $user_location_string="";
     //Page
     protected $user_middle_name="";
     //string
@@ -118,6 +122,7 @@ class User {
         $this -> user_birthday = $graphObject -> getProperty('birthday');
         $this -> user_context = $graphObject -> getProperty('context');
         $this -> user_cover = $graphObject -> getProperty('cover');
+        $this -> user_cover_source = $this -> user_cover -> getProperty('source');
         $this -> user_currency = $graphObject -> getProperty('currency');
         $this -> user_devices = $graphObject -> getProperty('devices');
         $this -> user_education = $graphObject -> getProperty('education');
@@ -144,19 +149,31 @@ class User {
         $this -> user_religion = $graphObject -> getProperty('religion');
         $this -> user_significant_other = $graphObject -> getProperty('significant_other');
         $this -> user_timezone = $graphObject -> getProperty('timezone');
-        $this -> user_third_party_id = $graphObject -> getProperty('third_party_id');
+        //$this -> user_third_party_id = $graphObject -> getProperty('third_party_id');
         $this -> user_verified = $graphObject -> getProperty('verified');
         $this -> user_website = $graphObject -> getProperty('website');
         $this -> user_work = $graphObject -> getProperty('work');
 
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends?fields=id,name,first_name,last_name,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
+        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends?fields=id,name,email,first_name,last_name,,middle_name,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
         $this -> friendList = $graphObject -> asArray();
         $this -> friendList_json = json_encode($this -> friendList);
         $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
+        
+        if(isset($this->user_hometown)){
+            $this->user_hometown_string=$this->user_hometown->getProperty('name');
+        }
+        
+        if(isset($this->user_location)){
+            $this->user_location_string=$this->user_location_string->getProperty('name');
+        }
+        
+        if(isset($this->user_cover)){
+            $this->user_cover_source=$this->user_cover->getProperty('source');
+        }
     }
 
     public function makeAdjMatrix(){

@@ -29,7 +29,7 @@ try {
 // see if we have a session
 if (isset($session)) {
     // graph api request for user data
-    $request = new FacebookRequest($session, 'GET', '/me');
+    $request = new FacebookRequest($session, 'GET', '/me?fields=cover,hometown,id,name,first_name,last_name,middle_name,gender,locale,birthday,location,relationship_status,picture.type(large)');
     $response = $request -> execute();
     // get response
     $graphObject = $response -> getGraphObject();
@@ -42,8 +42,14 @@ if (isset($session)) {
     $fbirthday = $graphObject -> getProperty('birthday');
     // To Get Facebook full name
     $flocation = $graphObject -> getProperty('hometown');
+    //echo $flocation, '<br>';
     //$flocation = $flocation['name'];
     $fpolitical = $graphObject -> getProperty('political');
+    //cover source
+    $fcover=$graphObject -> getProperty('cover');
+    $fcover=$fcover -> getProperty('source');
+    echo $fcover, '<br>';
+    //$fcover_source=$fcover -> getProperty('source');
     
     /*$flocation = new FacebookRequest($session, 'GET', '/me?fields=hometown{name}');
     $flocation= $flocation -> execute() -> getGraphObject(GraphUser::className());
@@ -51,35 +57,36 @@ if (isset($session)) {
     if (isset($flocation)) {
         $flocation = $flocation -> getProperty('name');        
     }
+    echo $flocation;
 
     try {
         // Logged in
-        $user_friends = new FacebookRequest($session, 'GET', '/me/friends');
-        $friends = $user_friends -> execute() -> getGraphObject(GraphUser::className());
-        $friends = $friends -> asArray();
+        //$user_friends = new FacebookRequest($session, 'GET', '/me/friends');
+        //$friends = $user_friends -> execute() -> getGraphObject(GraphUser::className());
+        //$friends = $friends -> asArray();
         //$pic = $user_photos["data"][0]->{"source"};
         //print_r($friends);
         /*$id='1379285485717850';
         $mutual = new FacebookRequest($session, 'GET', '/'.$id.'?fields=context.fields(mutual_friends)');
         $mutual = $mutual -> execute() -> getGraphObject(GraphUser::className());
         $mutual = $mutual -> asArray();*/
-        $user=new User('me',$session);
-        $user->makeAdjMatrix();
+        //$user=new User('me',$session);
+        //$user->makeAdjMatrix();
     } catch(FacebookRequestException $e) {
         echo "Exception occured, code: " . $e -> getCode();
         echo " with message: " . $e -> getMessage();
     }
     /* ---- Session Variables -----*/
     $_SESSION['FBID'] = $fbid;
-    $_SESSION['FULLNAME'] = $fbfullname;
-    $_SESSION['EMAIL'] = $user->getEmail();
-    $_SESSION['FRIENDS'] = $user->getFriends(false);
-    $_SESSION['ADJ'] = $user->getAdjMatrix();
-    $_SESSION['BIRTHDAY'] = $fbirthday;
-    $_SESSION['LOCATION'] = $flocation;
-    $_SESSION['POLITICAL'] = $fpolitical;
+    $_SESSION['FULLNAME'] = $fcover;
+   // $_SESSION['EMAIL'] = $user->getEmail();
+    //$_SESSION['FRIENDS'] = $user->getFriends(false);
+    //$_SESSION['ADJ'] = $user->getAdjMatrix();
+    //$_SESSION['BIRTHDAY'] = $fbirthday;
+    //$_SESSION['LOCATION'] = $flocation;
+    //$_SESSION['POLITICAL'] = $fpolitical;
     /* ---- header location after session ----*/
-    header("Location: index.php");
+    //header("Location: index.php");
 } else {
     $params = array('scope' => 'user_friends, email, user_birthday, user_hometown, user_religion_politics');
     //permissions
