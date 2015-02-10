@@ -200,6 +200,26 @@ class User {
         else
             return $this -> adj_matrix;
     }
+    
+    public function saveToDB($host,$user,$pwd,$base){
+        
+        // Connection to MySQL
+        $db = mysql_connect($host, $user, $pwd);
+        
+        // Base selection
+        mysql_select_db($base,$db); 
+
+        $attributes=get_object_vars($this);//array
+        foreach($attributes as $key => $value){
+            if(is_int($attributes[$key]) == false || is_bool($attributes[$key]) == false || is_string($attributes[$key]) == false || isset($attributes[$key]) == false){
+                unset($attributes[$key]);
+            } 
+        }
+        
+        $sql = sprintf('INSERT INTO table (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
+        mysql_query($sql);
+        mysql_close();
+    }
 
 
 }

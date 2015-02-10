@@ -1,5 +1,38 @@
 <?php
-session_start();
+$json='{
+  "data": [
+    {
+      "name": "Gaëtan Briant",
+      "id": "10153042884219165"
+    },
+    {
+      "name": "Stéphane Tanguy",
+      "id": "1037773419"
+    },
+    {
+      "name": "Julien Gambier-morel",
+      "id": "10205900211482103"
+    },
+    {
+      "name": "Kaji Sothy",
+      "id": "10206200407835779"
+    }
+  ],
+  "paging": {
+    "next": "https://graph.facebook.com/v2.2/10204445761636833/friends?limit=25&offset=25&__after_id=enc_AeyEl9WacChPKoPMbgqJMSQG8jyOl93CH4O_sW66DZhsv-VmuHzOx1453VpGJ1iUkfY"
+  },
+  "summary": {
+    "total_count": 222
+  }
+}"';
+echo $json;
+$arr = json_decode($json, true);
+var_dump($arr);
+echo count($arr);
+
+
+
+/*session_start();
 // added in v4.0.0
 require_once 'autoload.php';
 
@@ -44,7 +77,7 @@ if ( isset( $session ) ) {
  	    $fbuname = $graphObject->getProperty('username');  // To Get Facebook Username
  	    $fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
 	    $femail = $graphObject->getProperty('email');    // To Get Facebook email ID
-	/* ---- Session Variables -----*/
+/
 	    $_SESSION['FBID'] = $fbid;           
 	    $_SESSION['USERNAME'] = $fbuname;
         $_SESSION['FULLNAME'] = $fbfullname;
@@ -54,5 +87,5 @@ if ( isset( $session ) ) {
   // show login url
   echo '<a href="' . $helper->getLoginUrl() . '">Login</a>';
 }
-
+*/
 ?>
