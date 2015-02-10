@@ -18,15 +18,15 @@ use Facebook\HttpClients\FacebookHttpable;
 class User {
     protected $session;
     /* fields */
-    protected $user_id;
+    protected $user_id="";
     //string
-    protected $user_about;
+    protected $user_about="";
     //string
     protected $user_age_range;
     //object
-    protected $user_bio;
+    protected $user_bio="";
     //string
-    protected $user_birthday;
+    protected $user_birthday="";
     //string
     protected $user_context;
     //object
@@ -38,7 +38,7 @@ class User {
     //object[]
     protected $user_education;
     //object[]
-    protected $user_email;
+    protected $user_email="";
     //string
     protected $user_favorite_athletes;
     //Page[]
@@ -46,9 +46,9 @@ class User {
     //Page[]
     protected $user_first_name;
     //string
-    protected $user_gender;
+    protected $user_gender="";
     //string
-    protected $user_hometown;
+    protected $user_hometown="";
     //Page
     protected $user_inspirational_people;
     //Page[]
@@ -58,47 +58,50 @@ class User {
     //bool
     protected $user_languages;
     //Page[]
-    protected $user_last_name;
+    protected $user_last_name="";
     //string
-    protected $user_link;
+    protected $user_link="";
     //string
-    protected $user_locale;
+    protected $user_locale="";
     //string
     protected $user_location;
     //Page
-    protected $user_middle_name;
+    protected $user_middle_name="";
     //string
-    protected $user_name;
+    protected $user_name="";
     //string
-    protected $user_name_format;
+    protected $user_name_format="";
     //string
-    protected $user_political;
+    protected $user_political="";
     //string
-    protected $user_quotes;
+    protected $user_quotes="";
     //string
-    protected $user_relationship_status;
+    protected $user_relationship_status="";
     //string
-    protected $user_religion;
+    protected $user_religion="";
     //string
     protected $user_significant_other;
     //User
     protected $user_timezone;
     //int
-    protected $user_third_party_id;
+    //protected $user_third_party_id;
     //string
     protected $user_verified;
     //bool
-    protected $user_website;
+    protected $user_website="";
     //string
     protected $user_work;
     
     /* Edges */
     //object[]
     protected $friendList;
+    //string
+    protected $friendList_json="";
     //int
-    protected $friendTotalCount;
+    protected $friendTotalCount=0;
     /* Adjacency matrix */
     protected $adj_matrix;
+    protected $adj_matrix_json;
 
     function __construct($user = 'me',$session) {
         $this->session=$session;
@@ -147,11 +150,12 @@ class User {
         $this -> user_work = $graphObject -> getProperty('work');
 
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends');
+        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends?fields=id,name,first_name,last_name,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
         $this -> friendList = $graphObject -> asArray();
+        $this -> friendList_json = json_encode($this -> friendList);
         $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
     }
 
@@ -160,7 +164,7 @@ class User {
         $this->adj_matrix = array();
          
         /* Filling the adjacency matrix */
-        $n=$this -> friendTotalCount;
+        $n=count($this -> friendList["data"]);
         for($i=0;$i<$n;$i++){
           for($j=0;$j<$n;$j++){
             $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
@@ -175,7 +179,8 @@ class User {
               //echo "test0";
             }
           }
-        }        
+        }
+        $this->adj_matrix_json=json_encode($this->adj_matrix);        
     }
     
     public function getEmail() {
@@ -184,14 +189,14 @@ class User {
 
     public function getFriends($json=true) {
         if($json)
-            return json_encode($this -> friendList);
+            return $this -> friendList_json;
         else
             return $this -> friendList;
     }
     
     public function getAdjMatrix($json=true) {
         if($json)
-            return json_encode($this -> adj_matrix);
+            return $this -> adj_matrix_json;
         else
             return $this -> adj_matrix;
     }

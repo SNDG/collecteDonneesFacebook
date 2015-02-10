@@ -73,7 +73,7 @@ if (isset($session)) {
     $_SESSION['FBID'] = $fbid;
     $_SESSION['FULLNAME'] = $fbfullname;
     $_SESSION['EMAIL'] = $user->getEmail();
-    $_SESSION['FRIENDS'] = $user->getFriends();
+    $_SESSION['FRIENDS'] = $user->getFriends(false);
     $_SESSION['ADJ'] = $user->getAdjMatrix();
     $_SESSION['BIRTHDAY'] = $fbirthday;
     $_SESSION['LOCATION'] = $flocation;

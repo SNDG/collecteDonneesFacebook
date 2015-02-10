@@ -35,8 +35,9 @@ session_start();
 //echo "Total number of friends : ".$nb_friends, '<br>';
 //echo "Friends using the app / Total number of friends : ".($nb_friends_app/$nb_friends)."\n";
 //echo "first friend : ".$_SESSION['FRIENDS']['data'][0]->{"name"}, '<br>';
-//var_dump($_SESSION['FRIENDS']);
-echo $_SESSION['FRIENDS'], '<br>';
+var_dump($_SESSION['FRIENDS']);
+//echo $_SESSION['FRIENDS'], '<br>';
+echo "Taille : ".count($_SESSION['FRIENDS']["data"]);
 
 ?></li>
 <li class="nav-header">Birthday</li>
