@@ -100,7 +100,7 @@ class User {
     //object[]
     protected $friendList;
     //string
-    protected $friendList_json="";
+    protected $friendList_ids="";
     //int
     protected $friendTotalCount=0;
     /* Adjacency matrix */
@@ -110,7 +110,7 @@ class User {
     function __construct($user = 'me',$session) {
         $this->session=$session;
         // graph api request for user data
-        $request = new FacebookRequest($this->session, 'GET', '/' . $user);
+        $request = new FacebookRequest($this->session, 'GET', '/' . $user.'?fields=id,name,email,first_name,last_name,middle_name,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
@@ -122,7 +122,6 @@ class User {
         $this -> user_birthday = $graphObject -> getProperty('birthday');
         $this -> user_context = $graphObject -> getProperty('context');
         $this -> user_cover = $graphObject -> getProperty('cover');
-        $this -> user_cover_source = $this -> user_cover -> getProperty('source');
         $this -> user_currency = $graphObject -> getProperty('currency');
         $this -> user_devices = $graphObject -> getProperty('devices');
         $this -> user_education = $graphObject -> getProperty('education');
@@ -155,12 +154,14 @@ class User {
         $this -> user_work = $graphObject -> getProperty('work');
 
         // graph api request for user data
-        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends?fields=id,name,email,first_name,last_name,,middle_name,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
+        $request = new FacebookRequest($session, 'GET', '/' . $this -> user_id . '/friends?fields=id,name,first_name,last_name,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
         $this -> friendList = $graphObject -> asArray();
-        $this -> friendList_json = json_encode($this -> friendList);
+        foreach($this->friendList['data'] as $key => $value){
+            $this->friendList_ids=$this->friendList_ids.$value->{"id"}.";";
+        }
         $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
         
         if(isset($this->user_hometown)){
@@ -182,6 +183,7 @@ class User {
          
         /* Filling the adjacency matrix */
         $n=count($this -> friendList["data"]);
+        if($n>2){
         for($i=0;$i<$n;$i++){
           for($j=0;$j<$n;$j++){
             $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
@@ -197,6 +199,7 @@ class User {
             }
           }
         }
+        }
         $this->adj_matrix_json=json_encode($this->adj_matrix);        
     }
     
@@ -206,7 +209,7 @@ class User {
 
     public function getFriends($json=true) {
         if($json)
-            return $this -> friendList_json;
+            return json_encode($this -> friendList);
         else
             return $this -> friendList;
     }
@@ -220,22 +223,36 @@ class User {
     
     public function saveToDB($host,$user,$pwd,$base){
         
-        // Connection to MySQL
-        $db = mysql_connect($host, $user, $pwd);
+        try
+
+        {
         
-        // Base selection
-        mysql_select_db($base,$db); 
+            $db = new PDO('mysql:host='.$host.';dbname='.$base.';charset=utf8', $user, $pwd);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        }
+        
+        catch(Exception $e)
+        
+        {
+        
+                die('Error : '.$e->getMessage());
+        
+        }
 
         $attributes=get_object_vars($this);//array
         foreach($attributes as $key => $value){
-            if(is_int($attributes[$key]) == false || is_bool($attributes[$key]) == false || is_string($attributes[$key]) == false || isset($attributes[$key]) == false){
+            if((is_int($attributes[$key]) == false && is_bool($attributes[$key]) == false && is_string($attributes[$key]) == false) || isset($attributes[$key]) == false){
                 unset($attributes[$key]);
             } 
         }
         
-        $sql = sprintf('INSERT INTO table (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
-        mysql_query($sql);
-        mysql_close();
+        //$sql = sprintf('INSERT INTO table (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
+        $sql = sprintf('INSERT INTO FacebookUser (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
+        echo $sql;
+        $db->exec($sql);
+        //mysql_query($sql);
+        //mysql_close();
     }
 
 

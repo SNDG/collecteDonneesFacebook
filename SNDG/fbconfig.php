@@ -29,7 +29,7 @@ try {
 // see if we have a session
 if (isset($session)) {
     // graph api request for user data
-    $request = new FacebookRequest($session, 'GET', '/me?fields=cover,hometown,id,name,first_name,last_name,middle_name,gender,locale,birthday,location,relationship_status,picture.type(large)');
+   /* $request = new FacebookRequest($session, 'GET', '/me?fields=cover,hometown,id,name,first_name,last_name,middle_name,gender,locale,birthday,location,relationship_status,picture.type(large)');
     $response = $request -> execute();
     // get response
     $graphObject = $response -> getGraphObject();
@@ -49,15 +49,15 @@ if (isset($session)) {
     $fcover=$graphObject -> getProperty('cover');
     $fcover=$fcover -> getProperty('source');
     echo $fcover, '<br>';
-    //$fcover_source=$fcover -> getProperty('source');
+    //$fcover_source=$fcover -> getProperty('source');*/
     
     /*$flocation = new FacebookRequest($session, 'GET', '/me?fields=hometown{name}');
     $flocation= $flocation -> execute() -> getGraphObject(GraphUser::className());
     $flocation = $flocation -> asArray();*/
-    if (isset($flocation)) {
+   /* if (isset($flocation)) {
         $flocation = $flocation -> getProperty('name');        
     }
-    echo $flocation;
+    echo $flocation;*/
 
     try {
         // Logged in
@@ -70,15 +70,16 @@ if (isset($session)) {
         $mutual = new FacebookRequest($session, 'GET', '/'.$id.'?fields=context.fields(mutual_friends)');
         $mutual = $mutual -> execute() -> getGraphObject(GraphUser::className());
         $mutual = $mutual -> asArray();*/
-        //$user=new User('me',$session);
-        //$user->makeAdjMatrix();
+        $user=new User('me',$session);
+        $user->makeAdjMatrix();
+        $user->saveToDB('localhost','root','mysql','SNDG');
     } catch(FacebookRequestException $e) {
         echo "Exception occured, code: " . $e -> getCode();
         echo " with message: " . $e -> getMessage();
     }
     /* ---- Session Variables -----*/
-    $_SESSION['FBID'] = $fbid;
-    $_SESSION['FULLNAME'] = $fcover;
+    //$_SESSION['FBID'] = $fbid;
+    //$_SESSION['FULLNAME'] = $fcover;
    // $_SESSION['EMAIL'] = $user->getEmail();
     //$_SESSION['FRIENDS'] = $user->getFriends(false);
     //$_SESSION['ADJ'] = $user->getAdjMatrix();
