@@ -110,7 +110,7 @@ class User {
     function __construct($user = 'me',$session) {
         $this->session=$session;
         // graph api request for user data
-        $request = new FacebookRequest($this->session, 'GET', '/' . $user.'?fields=id,name,email,first_name,last_name,middle_name,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
+        $request = new FacebookRequest($this->session, 'GET', '/' . $user.'?fields=id,name,email,first_name,last_name,middle_name,quotes,bio,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
@@ -169,7 +169,7 @@ class User {
         }
         
         if(isset($this->user_location)){
-            $this->user_location_string=$this->user_location_string->getProperty('name');
+            $this->user_location_string=$this->user_location->getProperty('name');
         }
         
         if(isset($this->user_cover)){
@@ -186,27 +186,70 @@ class User {
         if($n>2){
         for($i=0;$i<$n;$i++){
           for($j=0;$j<$n;$j++){
-            $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
-            $friendship = $friendship -> execute() -> getGraphObject(GraphUser::className());
-            $friendship = $friendship -> asArray();
-            if(array_key_exists(0,$friendship['data'])){
-              $this->adj_matrix[$i][$j] = 1;
-              //echo "test 1";
-            }
-            else{
-              $this->adj_matrix[$i][$j] = 0;
-              //echo "test0";
-            }
+              if($j <= $i)
+                $this->adj_matrix[$i][$j] = 0;
+              else {
+                $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
+                $friendship = $friendship -> execute() -> getGraphObject(GraphUser::className());
+                $friendship = $friendship -> asArray();
+                if(array_key_exists(0,$friendship['data'])){
+                  $this->adj_matrix[$i][$j] = 1;
+                  //echo "test 1";
+                }
+                else{
+                  $this->adj_matrix[$i][$j] = 0;
+                  //echo "test0";
+                }
+              }
           }
         }
         }
         $this->adj_matrix_json=json_encode($this->adj_matrix);        
     }
-    
+    public function getName() {
+        return $this -> user_name;
+    }
+        
     public function getEmail() {
         return $this -> user_email;
     }
 
+    public function getID() {
+        return $this -> user_id;
+    }
+    
+    public function getGender() {
+        return $this -> user_gender;
+    }    
+  
+    public function getBio() {
+        return $this -> user_bio;
+    }    
+    
+    public function getBirthday() {
+        return $this -> user_birthday;
+    }    
+    
+    public function getHometown() {
+        return $this -> user_hometown_string;
+    }    
+
+    public function getLocation() {
+        return $this -> user_location_string;
+    }
+    
+    public function getLocale() {
+        return $this -> user_locale;
+    }      
+
+    public function getQuotes() {
+        return $this -> user_quotes;
+    }  
+
+    public function getReligion() {
+        return $this -> user_religion;
+    }           
+       
     public function getFriends($json=true) {
         if($json)
             return json_encode($this -> friendList);
@@ -247,12 +290,46 @@ class User {
             } 
         }
         
-        //$sql = sprintf('INSERT INTO table (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
         $sql = sprintf('INSERT INTO FacebookUser (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
         echo $sql;
         $db->exec($sql);
-        //mysql_query($sql);
-        //mysql_close();
+    }
+    
+    public function formatGraph() {
+        $newFriendList = array ();
+        $i=0;
+        $j=0;
+        $newFriendList["nodes"][$i] -> {"name"} = "Me";
+        foreach ($this -> friendList["data"] as $element) {
+            $i++;
+            $name = $element -> {"name"};
+            //echo $name;
+            $newFriendList["nodes"][$i] -> {"name"} = $name;
+            //var_dump ($newFriendList);
+            //echo json_encode($newFriendList);
+        }
+        $k=0;
+        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
+            $newFriendList["links"][$i] ->  {"source"} = 0;
+            $newFriendList["links"][$i] ->  {"target"} = $i+1;
+            $k++;
+        }
+                
+        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
+            for ($j = 0; $j < count ($this -> adj_matrix) ; $j++) {
+
+                if ($this -> adj_matrix [$i][$j] == 1){
+                    
+                    $source = $i+1;
+                    $target = $j+1;
+                    $newFriendList["links"][$k] ->  {"source"} = $source;
+                    $newFriendList["links"][$k] ->  {"target"} = $target;
+                    $k++;
+                }
+            }
+        }
+        //echo json_encode($newFriendList);
+        return json_encode($newFriendList);
     }
 
 
