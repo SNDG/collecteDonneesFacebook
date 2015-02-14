@@ -70,7 +70,7 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
 <html>
 
 <head>
-  <title>.:: SNDG ::. Social Network</title>
+  <title>.:: SNDG ::. Social Network Data Gathering</title>
   <meta name="description" content="SNDG (Social Networks Data Gathering) is a tool which allows researchers or enthusiasts to gather data from social network services, and to visualize it afterwards. For now, the only SNS supported is Facebook. This is an academic project proposed by two professors of the LUSSI department in Telecom Bretagne, and conducted by two FIP students (students in an apprenticeship program)." />
   <meta name="keywords" content="SNDG, social network, facebook, Telecom Bretagne, Institut Mines-Telecom, LUSSI" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -141,7 +141,7 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
         <p>SNDG (Social Networks Data Gathering) is a tool which allows researchers or enthusiasts to gather data from social network services, and to visualize it afterwards. For now, the only SNS supported is Facebook.</p>
         <p>This is an academic project proposed by two professors of the <a href="http://departements.telecom-bretagne.eu/lussi/">LUSSI</a> department in Telecom Bretagne, and developped by two <a href="http://www.telecom-bretagne.eu/formations/ingenieur_specialise/">FIP</a> students (engineering students in an apprenticeship program).</p>
         <h2>Research Description</h2>
-        <p>This template has been tested in the following browsers:</p>
+        <p>Blabla:</p>
         <ul>
           <li>Blabla</li>
           <li>Blabla</li>

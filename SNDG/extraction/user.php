@@ -183,7 +183,7 @@ class User {
          
         /* Filling the adjacency matrix */
         $n=count($this -> friendList["data"]);
-        if($n>2){
+        if($n>=2){
         for($i=0;$i<$n;$i++){
           for($j=0;$j<$n;$j++){
               if($j <= $i)
