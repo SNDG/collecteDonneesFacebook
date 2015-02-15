@@ -17,7 +17,7 @@ require_once 'extraction/user.php';
 // init app with app id and secret
 FacebookSession::setDefaultApplication('1395213007449007', 'cf3de50a843b4b3c631a436911484d0a');
 // login helper with redirect_uri
-$helper = new FacebookRedirectLoginHelper('http://localhost/SNDG/index.php');
+$helper = new FacebookRedirectLoginHelper('http://localhost/SNDG/index.php');//callback URL
 try {
     $session = $helper -> getSessionFromRedirect();
 } catch( FacebookRequestException $ex ) {
@@ -25,23 +25,26 @@ try {
 } catch( Exception $ex ) {
     // When validation fails or other local issues
 }
+
+//Default page is index
 if(!isset($_GET['page']))
     $_GET['page']="index";
 
-
+//if we saved the token, then we can instantiate a Facebook Session without the need of the login helper
 if(isset($_SESSION['token']))
     $session = new FacebookSession($_SESSION['token']);
 
 if(isset($_GET['action'])){
+    //login action
     if($_GET['action']=="login" && !isset($session)){
-
-            $params = array('scope' => 'user_about_me, user_friends, email, user_birthday, user_hometown, user_location, user_about_me, user_religion_politics');
             //permissions
+            $params = array('scope' => 'user_about_me, user_friends, email, user_birthday, user_hometown, user_location, user_about_me, user_religion_politics');
             $loginUrl = $helper -> getLoginUrl($params);
             header("Location: " . $loginUrl);
     }
 }
 
+//Once we have a user object from FB, we can save his information into PHP session variables
 function setSessionVariables($user_var,$user_session)
 {
     $_SESSION['token'] = $user_session->getToken();
@@ -59,10 +62,11 @@ function setSessionVariables($user_var,$user_session)
     $_SESSION['fb_graph']=$user_var->formatGraph();
 }
 
+//Creates the user object and saves user data into the DB once in a session time
 if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
     $user=new User('me',$session);
     $user->makeAdjMatrix();
-    //$user->saveToDB('localhost','root','mysql','SNDG');
+    $user->saveToDB('localhost','root','mysql','SNDG');
     setSessionVariables($user,$session);
 }
 ?>
@@ -75,6 +79,7 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
   <meta name="keywords" content="SNDG, social network, facebook, Telecom Bretagne, Institut Mines-Telecom, LUSSI" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <link rel="stylesheet" type="text/css" href="style/style.css" />
+  <!-- little piece of CSS needed for the D3.JS graph part -->
   <style>
 
     .node {
@@ -95,14 +100,12 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
     <div id="header">
       <div id="logo">
         <div id="logo_text">
-          <!-- class="logo_colour", allows you to change the colour of the text -->
           <h1><a href="index.php"><span class="logo_colour">SNDG</span></a></h1>
           <h2>Social Network Data Gathering</h2>
         </div>
       </div>
       <div id="menubar">
         <ul id="menu">
-          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li id="li_home" class="selected"><a href="index.php?page=index">Home</a></li>
           <li id="li_info"><a href="index.php?page=info">Information about the user</a></li>
           <li id="li_graph"><a href="index.php?page=graph">Friend Network Graph</a></li>
@@ -112,10 +115,9 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
     <div id="content_header"></div>
     <div id="site_content">
       <div id="sidebar_container">
-        <div class="sidebar">
+        <div class="sidebar"> <!-- Contains basic info about the user logged in (Profile picture, name) and login/logout link -->
           <div class="sidebar_top"></div>
           <div class="sidebar_item">
-            <!-- insert your sidebar items here -->
             <?php
             if (isset($session)) {?>
             <h3><?php echo $_SESSION['fb_name'];?></h3>
@@ -133,10 +135,13 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
           <div class="sidebar_base"></div>
         </div>
       </div>
-      <div id="content">
+      
+      <div id="content"><!-- Content of the page: this is the part which changes when clicking on another tab -->
+          
+          <!-- "Index" page -->
+          
           <?php
           if($_GET['page']=="index"){?>
-        <!-- insert the page content here -->
         <h1>Welcome to SNDG</h1>
         <p>SNDG (Social Networks Data Gathering) is a tool which allows researchers or enthusiasts to gather data from social network services, and to visualize it afterwards. For now, the only SNS supported is Facebook.</p>
         <p>This is an academic project proposed by two professors of the <a href="http://departements.telecom-bretagne.eu/lussi/">LUSSI</a> department in Telecom Bretagne, and developped by two <a href="http://www.telecom-bretagne.eu/formations/ingenieur_specialise/">FIP</a> students (engineering students in an apprenticeship program).</p>
@@ -147,9 +152,13 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
           <li>Blabla</li>
           <li>...</li>
         </ul>
+        
+        <!-- "Information about the user" page -->
+        
         <?php }
           elseif($_GET['page']=="info"){
         ?>
+        <!-- Piece of JS code to highlight the right tab-->
         <script>
             document.getElementById('li_info').setAttribute("class","selected");
             document.getElementById('li_home').removeAttribute("class");
@@ -178,21 +187,28 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
             <?php
             $n=0;
             $friends=json_decode($_SESSION['fb_friends'], true);
-            //var_dump($friends);
             foreach($friends['data'] as $friend) { 
             ?>
             <tr><td><?php echo $n++; ?></td><td><img src="<?php echo $friend["picture"]["data"]["url"];?>"></td><td><?php echo $friend["name"];?></td><td><?php echo $friend["id"];?></td></tr>
             <?php } ?>
         </table>   
+        
+        <!-- Graph page -->
+        
         <?php }
           elseif($_GET['page']=="graph"){
         ?>
+        <!-- Piece of JS code to highlight the right tab-->
         <script>
             document.getElementById('li_graph').setAttribute("class","selected");
             document.getElementById('li_home').removeAttribute("class");
             document.getElementById('li_info').removeAttribute("graph");
         </script>
         <h1>Friend Network Graph</h1>
+        
+        <!-- D3.JS graph rendering script -->
+        <!-- Original script: http://bl.ocks.org/mbostock/4062045 -->
+        <!-- Modified to show only one node color (no grouping) and to display names next to the nodes-->
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script>
         
@@ -260,7 +276,10 @@ if(isset($session) && !isset($user) && !isset($_SESSION['fb_id'])){
         <?php } ?>
       </div>
     </div>
+    
     <div id="content_footer"></div>
+    
+    <!-- Footer -->
     <div id="footer">
       <p><img src="images/TB_contour_quadri.jpg" alt="TB" height="64" width="64">&nbsp;<img src="images/INSTITUT-MINES-TELECOM_WEB.png" alt="Institut Mines-Telecom" height="64" width="64">&nbsp;</p>
       <p>SNDG | <a href="http://validator.w3.org/check?uri=referer">HTML5</a> | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> | <a href="http://www.html5webtemplates.co.uk">Based on Simple Style 4 from HTML5webtemplates.co.uk</a></p>
