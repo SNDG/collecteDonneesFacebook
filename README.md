@@ -1,2 +1,2 @@
-# collecteDonneesFacebook
-Développement d'un outil d'extraction du réseau social sur Facebook
+# SNDG: Social Network Data Gathering
+Documentation is available in the "docs" folder, only in french for now.
