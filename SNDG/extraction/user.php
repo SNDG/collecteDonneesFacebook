@@ -12,12 +12,19 @@ use Facebook\GraphUser;
 use Facebook\Entities\AccessToken;
 use Facebook\HttpClients\FacebookCurlHttpClient;
 use Facebook\HttpClients\FacebookHttpable;
+
 /**
  * Class containing the user node
  */
+
 class User {
+    /** Class attributes **/
+    
     protected $session;
+    
     /* fields */
+    
+    
     protected $user_id="";
     //string
     protected $user_about="";
@@ -103,17 +110,22 @@ class User {
     protected $friendList_ids="";
     //int
     protected $friendTotalCount=0;
+    
     /* Adjacency matrix */
     protected $adj_matrix;
     protected $adj_matrix_json;
 
+    /* Class constructor */
     function __construct($user = 'me',$session) {
-        $this->session=$session;
+        $this->session=$session;//get the facebook session
+        
         // graph api request for user data
         $request = new FacebookRequest($this->session, 'GET', '/' . $user.'?fields=id,name,email,first_name,last_name,middle_name,quotes,bio,cover,gender,locale,birthday,location,hometown,relationship_status,picture.type(large)&limit=100');
         $response = $request -> execute();
+        
         // get response
         $graphObject = $response -> getGraphObject();
+        
         // get fields
         $this -> user_id = $graphObject -> getProperty('id');
         $this -> user_about = $graphObject -> getProperty('about');
@@ -148,7 +160,7 @@ class User {
         $this -> user_religion = $graphObject -> getProperty('religion');
         $this -> user_significant_other = $graphObject -> getProperty('significant_other');
         $this -> user_timezone = $graphObject -> getProperty('timezone');
-        //$this -> user_third_party_id = $graphObject -> getProperty('third_party_id');
+        //$this -> user_third_party_id = $graphObject -> getProperty('third_party_id'); <- is it useful ?
         $this -> user_verified = $graphObject -> getProperty('verified');
         $this -> user_website = $graphObject -> getProperty('website');
         $this -> user_work = $graphObject -> getProperty('work');
@@ -158,12 +170,15 @@ class User {
         $response = $request -> execute();
         // get response
         $graphObject = $response -> getGraphObject();
-        $this -> friendList = $graphObject -> asArray();
+        $this -> friendList = $graphObject -> asArray();//transforms the graph object into an array
+        
+        //Put all of the friends' IDs into a string, in order to be saved in the DB
         foreach($this->friendList['data'] as $key => $value){
             $this->friendList_ids=$this->friendList_ids.$value->{"id"}.";";
         }
         $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
         
+        /* Get a relevant information from attributes that have a type different than int,string or bool*/
         if(isset($this->user_hometown)){
             $this->user_hometown_string=$this->user_hometown->getProperty('name');
         }
@@ -173,7 +188,7 @@ class User {
         }
         
         if(isset($this->user_cover)){
-            $this->user_cover_source=$this->user_cover->getProperty('source');
+            $this->user_cover_source=$this->user_cover->getProperty('source');//get the cover picture url
         }
     }
 
@@ -182,23 +197,25 @@ class User {
         $this->adj_matrix = array();
          
         /* Filling the adjacency matrix */
-        $n=count($this -> friendList["data"]);
-        if($n>=2){
-        for($i=0;$i<$n;$i++){
-          for($j=0;$j<$n;$j++){
+        $n=count($this -> friendList["data"]);//this is a nxn matrix, where n is the number of friends
+        if($n>=2){//if you have less than 2 friends, then it's useless to build an adjacency matrix
+        for($i=0;$i<$n;$i++){//lines of the matrix
+          for($j=0;$j<$n;$j++){//columns of the matrix
+              //you only need to know if a is friend with b, not that b is friend with a. This prevents double connected vertices in the friend network graph.
               if($j <= $i)
                 $this->adj_matrix[$i][$j] = 0;
               else {
                 $friendship = new FacebookRequest($this->session, 'GET', '/'.$this->friendList['data'][$i]->{"id"}.'/friends/'.$this->friendList['data'][$j]->{"id"});
                 $friendship = $friendship -> execute() -> getGraphObject(GraphUser::className());
                 $friendship = $friendship -> asArray();
+                
+                /* if a and b are friends, then the API should return basic information about b in friendship['data'].
+                 * If there is nothing, then they are not friends */
                 if(array_key_exists(0,$friendship['data'])){
                   $this->adj_matrix[$i][$j] = 1;
-                  //echo "test 1";
                 }
                 else{
                   $this->adj_matrix[$i][$j] = 0;
-                  //echo "test0";
                 }
               }
           }
@@ -206,6 +223,86 @@ class User {
         }
         $this->adj_matrix_json=json_encode($this->adj_matrix);        
     }
+
+    // Function allowing export of the class attributes (string, int and bool) to a MySQL DB
+    public function saveToDB($host,$user,$pwd,$base){
+        
+        try
+
+        {
+        
+            $db = new PDO('mysql:host='.$host.';dbname='.$base.';charset=utf8', $user, $pwd);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        }
+        
+        catch(Exception $e)
+        
+        {
+        
+                die('Error : '.$e->getMessage());
+        
+        }
+
+        //get all of the class attributes in an associative array -> attributes['name of the attribute']=value
+        $attributes=get_object_vars($this);
+        
+        //We just save attributes of the following types: int, string and bool. We just delete the others in the array.
+        foreach($attributes as $key => $value){
+            if((is_int($attributes[$key]) == false && is_bool($attributes[$key]) == false && is_string($attributes[$key]) == false) || isset($attributes[$key]) == false){
+                unset($attributes[$key]);
+            } 
+        }
+        
+        //SQL Insert command
+        $sql = sprintf('INSERT INTO FacebookUser (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
+        //echo $sql;
+        
+        //Execution of the command
+        $db->exec($sql);
+    }
+    
+    //This function returns a json designed to work with the D3.js graph rendering script
+    public function formatGraph() {
+        $newFriendList = array ();
+        $i=0;
+        $j=0;
+        $newFriendList["nodes"][$i] -> {"name"} = "Me";//the first node is the user
+        
+        //Nodes are named according to the friend's names
+        foreach ($this -> friendList["data"] as $element) {
+            $i++;
+            $name = $element -> {"name"};
+            $newFriendList["nodes"][$i] -> {"name"} = $name;
+        }
+        
+        /* Put the links between "Me" user and all of his friends */
+        $k=0;
+        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
+            $newFriendList["links"][$i] ->  {"source"} = 0;
+            $newFriendList["links"][$i] ->  {"target"} = $i+1;
+            $k++;
+        }
+        
+        //Put the links between the friends of the user according to the adjacency matrix        
+        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
+            for ($j = 0; $j < count ($this -> adj_matrix) ; $j++) {
+
+                if ($this -> adj_matrix [$i][$j] == 1){
+                    
+                    $source = $i+1;
+                    $target = $j+1;
+                    $newFriendList["links"][$k] ->  {"source"} = $source;
+                    $newFriendList["links"][$k] ->  {"target"} = $target;
+                    $k++;
+                }
+            }
+        }
+        return json_encode($newFriendList);
+    }
+
+    /* Class attribute accessors */
+
     public function getName() {
         return $this -> user_name;
     }
@@ -262,74 +359,6 @@ class User {
             return $this -> adj_matrix_json;
         else
             return $this -> adj_matrix;
-    }
-    
-    public function saveToDB($host,$user,$pwd,$base){
-        
-        try
-
-        {
-        
-            $db = new PDO('mysql:host='.$host.';dbname='.$base.';charset=utf8', $user, $pwd);
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        }
-        
-        catch(Exception $e)
-        
-        {
-        
-                die('Error : '.$e->getMessage());
-        
-        }
-
-        $attributes=get_object_vars($this);//array
-        foreach($attributes as $key => $value){
-            if((is_int($attributes[$key]) == false && is_bool($attributes[$key]) == false && is_string($attributes[$key]) == false) || isset($attributes[$key]) == false){
-                unset($attributes[$key]);
-            } 
-        }
-        
-        $sql = sprintf('INSERT INTO FacebookUser (%s) VALUES ("%s")',implode(',',array_keys($attributes)),implode('","',array_values($attributes)));
-        echo $sql;
-        $db->exec($sql);
-    }
-    
-    public function formatGraph() {
-        $newFriendList = array ();
-        $i=0;
-        $j=0;
-        $newFriendList["nodes"][$i] -> {"name"} = "Me";
-        foreach ($this -> friendList["data"] as $element) {
-            $i++;
-            $name = $element -> {"name"};
-            //echo $name;
-            $newFriendList["nodes"][$i] -> {"name"} = $name;
-            //var_dump ($newFriendList);
-            //echo json_encode($newFriendList);
-        }
-        $k=0;
-        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
-            $newFriendList["links"][$i] ->  {"source"} = 0;
-            $newFriendList["links"][$i] ->  {"target"} = $i+1;
-            $k++;
-        }
-                
-        for ($i = 0; $i < count ($this -> adj_matrix) ; $i++) {
-            for ($j = 0; $j < count ($this -> adj_matrix) ; $j++) {
-
-                if ($this -> adj_matrix [$i][$j] == 1){
-                    
-                    $source = $i+1;
-                    $target = $j+1;
-                    $newFriendList["links"][$k] ->  {"source"} = $source;
-                    $newFriendList["links"][$k] ->  {"target"} = $target;
-                    $k++;
-                }
-            }
-        }
-        //echo json_encode($newFriendList);
-        return json_encode($newFriendList);
     }
 
 
