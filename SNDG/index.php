@@ -38,7 +38,7 @@ if(isset($_GET['action'])){
     //login action
     if($_GET['action']=="login" && !isset($session)){
             //permissions
-            $params = array('scope' => 'user_about_me, user_friends, email, user_birthday, user_hometown, user_location, user_about_me, user_religion_politics');
+            $params = array('scope' => 'user_about_me, user_friends, email, user_birthday, user_hometown, user_location, user_religion_politics');
             $loginUrl = $helper -> getLoginUrl($params);
             header("Location: " . $loginUrl);
     }
