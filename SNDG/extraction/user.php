@@ -173,8 +173,8 @@ class User {
         $this -> friendList = $graphObject -> asArray();//transforms the graph object into an array
         
         //Put all of the friends' IDs into a string, in order to be saved in the DB
-        foreach($this->friendList['data'] as $key => $value){
-            $this->friendList_ids=$this->friendList_ids.$value->{"id"}.";";
+        foreach($this -> friendList["data"] as $element){
+            $this->friendList_ids=$this->friendList_ids.$element->{"id"}.";";
         }
         $this -> friendTotalCount = $this -> friendList['summary']->{"total_count"};
         

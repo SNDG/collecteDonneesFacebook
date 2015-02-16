@@ -35,8 +35,8 @@ user_timezone INT(30),
 user_verified boolean,
 user_website VARCHAR(100),
 user_work VARCHAR(10000),
-friendList_ids VARCHAR(0),
-adj_matrix_json VARCHAR(0),
+friendList_ids LONGTEXT,
+adj_matrix_json LONGTEXT,
 friendTotalCount INT(4),
 CONSTRAINT pk_user PRIMARY KEY (user_id,user_timestamp)
 ) 
